@@ -17,7 +17,7 @@ export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly notificationService: NotificationService,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService
   ) {}
 
   async registerClient(userDto: ClientUserDto) {
@@ -48,26 +48,59 @@ export class AuthService {
       userType.userTypeId === UserTypeEnum.CLIENT
         ? getInfo.clientid
         : getInfo.staffid;
-    const {
-      firstName,
-      middleName,
-      lastName,
+    const { fullName, email, mobileNumber, address, birthDate, age, gender } =
+      getInfo;
+    return {
+      userId,
+      username,
+      userType,
+      fullName,
       email,
       mobileNumber,
       address,
       birthDate,
       age,
       gender,
-      fullName,
-    } = getInfo;
+      role: getInfo.user.role,
+      accessToken,
+      refreshToken,
+      userTypeIdentityId,
+      userProfilePic: getInfo.user.userProfilePic
+        ? getInfo.user.userProfilePic.file.url
+        : null,
+    };
+  }
+
+  async loginStaff({ username, password }: LoginUserDto) {
+    // find user in db
+    const user: Users = await this.usersService.findByLoginStaff(
+      username,
+      password
+    );
+
+    // generate and sign token
+    const { userId } = user;
+    const getInfo: any = await this.usersService.findById(userId);
+    const accessToken: string = await this.getAccessToken(userId);
+    const refreshToken: string = await this.getRefreshToken(userId);
+    getInfo.user.role.roleId =
+      getInfo.user.role.roleId === null ||
+      getInfo.user.role.roleId === undefined
+        ? RoleEnum.GUEST.toString()
+        : getInfo.user.role.roleId;
+    await this.updateRefreshTokenInUser(refreshToken, userId);
+    const userType = getInfo.user.userType;
+    const userTypeIdentityId =
+      userType.userTypeId === UserTypeEnum.CLIENT
+        ? getInfo.clientid
+        : getInfo.staffid;
+    const { fullName, email, mobileNumber, address, birthDate, age, gender } =
+      getInfo;
     return {
       userId,
       username,
       userType,
       fullName,
-      firstName,
-      middleName,
-      lastName,
       email,
       mobileNumber,
       address,

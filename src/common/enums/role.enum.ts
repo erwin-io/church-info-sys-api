@@ -1,5 +1,5 @@
 export enum RoleEnum {
   ADMIN = 1,
-  FRONTDESK = 4,
-  GUEST = 5
+  FRONTDESK = 2,
+  GUEST = 3
 }

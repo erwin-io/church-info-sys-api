@@ -1,4 +1,11 @@
-import { IsNotEmpty, IsEmail, IsDate, IsBoolean, IsOptional, IsString } from "class-validator";
+import {
+  IsNotEmpty,
+  IsEmail,
+  IsDate,
+  IsBoolean,
+  IsOptional,
+  IsString,
+} from "class-validator";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform, Type } from "class-transformer";
 import { ToBoolean } from "src/common/helper/env.helper";
@@ -29,15 +36,7 @@ export class ToggleEnableDto extends UserDto {
 export class UpdateStaffUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
-  firstName: string;
-
-  @ApiProperty()
-  @IsOptional()
-  middleName: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  lastName: string;
+  name: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -47,10 +46,6 @@ export class UpdateStaffUserDto extends UserDto {
   @ApiProperty()
   @IsNotEmpty()
   mobileNumber: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  address: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -105,7 +100,6 @@ export class UpdateClientUserDto extends UserDto {
   @IsOptional()
   userProfilePic: any;
 }
-
 
 export class UpdatePasswordDto extends UserDto {
   @ApiProperty()

@@ -24,15 +24,7 @@ export class CreateUserDto {
 export class StaffUserDto extends CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
-  firstName: string;
-
-  @ApiProperty()
-  @IsOptional()
-  middleName: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  lastName: string;
+  name: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -42,10 +34,6 @@ export class StaffUserDto extends CreateUserDto {
   @ApiProperty()
   @IsNotEmpty()
   mobileNumber: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  address: string;
 
   @ApiProperty()
   @IsNotEmpty()

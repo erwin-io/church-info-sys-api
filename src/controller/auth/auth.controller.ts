@@ -59,7 +59,7 @@ export class AuthController {
   public async loginStaff(@Body() loginUserDto: LoginUserDto) {
     const res: CustomResponse = {};
     try {
-      res.data = await this.authService.login(loginUserDto);
+      res.data = await this.authService.loginStaff(loginUserDto);
       res.success = true;
       return res;
     } catch (e) {

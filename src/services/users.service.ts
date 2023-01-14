@@ -88,10 +88,7 @@ export class UsersService {
   ) {
     const params: any = {
       keyword: `%${keyword}%`,
-      roles:
-        roles.length === 0
-          ? ["Admin", "Manager", "Veterinarian", "Front desk"]
-          : roles,
+      roles: roles.length === 0 ? ["Admin", "Front desk"] : roles,
     };
     let query = await this.userRepo.manager
       .createQueryBuilder("Staff", "s")
@@ -102,9 +99,7 @@ export class UsersService {
 
     if (advanceSearch) {
       query = query
-        .where(
-          "CONCAT(s.firstName, ' ', ISNULL(s.middleName, ''), ' ', s.lastName) LIKE :name"
-        )
+        .where("s.name LIKE :name")
         .andWhere("r.name IN(:...roles)")
         .andWhere("u.userId like :userId")
         .andWhere("u.username like :username")
@@ -123,9 +118,7 @@ export class UsersService {
         .orWhere("u.username like :keyword")
         .orWhere("s.email like :keyword")
         .orWhere("s.mobileNumber like :keyword")
-        .orWhere("ISNULL(s.firstName, '') like :keyword")
-        .orWhere("ISNULL(s.middleName, '') like :keyword")
-        .orWhere("ISNULL(s.lastName, '') like :keyword")
+        .orWhere("s.name like :keyword")
         .orderBy("u.userId", "DESC");
     }
     query = query.setParameters(params);
@@ -192,7 +185,11 @@ export class UsersService {
   ) {
     const user: any = await entityManager.findOne(Users, {
       where: options,
-      relations: ["userType", "role", "userProfilePic"],
+      relations: {
+        userType: true,
+        role: true,
+        userProfilePic: { file: true },
+      },
     });
     if (!user) {
       return;
@@ -211,12 +208,7 @@ export class UsersService {
         },
         relations: ["user", "gender"],
       });
-      result.fullName =
-        result.firstName +
-        " " +
-        (result.MiddleName !== undefined
-          ? result.MiddleName + " " + result.lastName
-          : result.lastName);
+      result.fullName = result.name;
       result.user.role = user.role;
       result.user = sanitizeUser ? this._sanitizeUser(user) : result.user;
       if (result.user.role.roleId === RoleEnum.GUEST.toString())
@@ -236,7 +228,7 @@ export class UsersService {
         where: {
           user: options,
         },
-        relations: ["user", "gender", "pets"],
+        relations: ["user", "gender"],
       });
       result.fullName =
         result.firstName +
@@ -290,6 +282,25 @@ export class UsersService {
   async findByLogin(username, password) {
     const result = await this.findOne(
       { username },
+      false,
+      this.userRepo.manager
+    );
+    if (!result) {
+      throw new HttpException("Username not found", HttpStatus.NOT_FOUND);
+    }
+    if (!result.user.enable) {
+      throw new HttpException("Yout account has been disabled", HttpStatus.OK);
+    }
+    const areEqual = await compare(result.user.password, password);
+    if (!areEqual) {
+      throw new HttpException("Invalid credentials", HttpStatus.NOT_ACCEPTABLE);
+    }
+    return this._sanitizeUser(result.user);
+  }
+
+  async findByLoginStaff(username, password) {
+    const result = await this.findOne(
+      { username, userType: { userTypeId: 1 } },
       false,
       this.userRepo.manager
     );
@@ -380,12 +391,9 @@ export class UsersService {
       user = await entityManager.save(Users, user);
       let staff = new Staff();
       staff.user = user;
-      staff.firstName = userDto.firstName;
-      staff.middleName = userDto.middleName;
-      staff.lastName = userDto.lastName;
+      staff.name = userDto.name;
       staff.email = userDto.email;
       staff.mobileNumber = userDto.mobileNumber;
-      staff.address = userDto.address;
       staff.gender = new Gender();
       staff.gender.genderId = userDto.genderId;
       staff = await entityManager.save(Staff, staff);
@@ -452,12 +460,9 @@ export class UsersService {
       user = await entityManager.save(Users, user);
       let staff = new Staff();
       staff.user = user;
-      staff.firstName = userDto.firstName;
-      staff.middleName = userDto.middleName;
-      staff.lastName = userDto.lastName;
+      staff.name = userDto.name;
       staff.email = userDto.email;
       staff.mobileNumber = userDto.mobileNumber;
-      staff.address = userDto.address;
       staff.gender = new Gender();
       staff.gender.genderId = userDto.genderId;
       staff = await entityManager.save(Staff, staff);
@@ -501,96 +506,95 @@ export class UsersService {
 
   async updateClientProfilePicture(dto: UpdateClientProfilePictureDto) {
     const userId = dto.userId;
-    return await this.userRepo.manager
-      .transaction(async (entityManager) => {
-        let client: any = await this.findOne(
-          {
-            userId,
-            userType: { userTypeId: "2" },
-          },
-          true,
-          entityManager
-        );
-        if (!client) {
-          throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
-        }
-        const user: Users = client.user;
-        if (dto.userProfilePic) {
-          const newFileName: string = uuid();
-          let userProfilePic = await entityManager.findOne(UserProfilePic, {
-            where: { userId: user.userId },
-            relations: ["file"],
-          });
-          const bucket = this.firebaseProvoder.app.storage().bucket();
-          if (userProfilePic) {
-            try {
-              const deleteFile = bucket.file(
-                `profile/${userProfilePic.file.fileName}`
-              );
-              deleteFile.delete();
-            } catch (ex) {
-              console.log(ex);
-            }
-            const file = userProfilePic.file;
-            file.fileName = `${newFileName}${extname(
-              dto.userProfilePic.fileName
-            )}`;
-
-            const bucketFile = bucket.file(
-              `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
+    return await this.userRepo.manager.transaction(async (entityManager) => {
+      let client: any = await this.findOne(
+        {
+          userId,
+          userType: { userTypeId: "2" },
+        },
+        true,
+        entityManager
+      );
+      if (!client) {
+        throw new HttpException(`User doesn't exist`, HttpStatus.NOT_FOUND);
+      }
+      const user: Users = client.user;
+      if (dto.userProfilePic) {
+        const newFileName: string = uuid();
+        let userProfilePic = await entityManager.findOne(UserProfilePic, {
+          where: { userId: user.userId },
+          relations: ["file"],
+        });
+        const bucket = this.firebaseProvoder.app.storage().bucket();
+        if (userProfilePic) {
+          try {
+            const deleteFile = bucket.file(
+              `profile/${userProfilePic.file.fileName}`
             );
-            const img = Buffer.from(dto.userProfilePic.data, "base64");
-            return await bucketFile.save(img).then(async (res) => {
-              console.log("res");
-              console.log(res);
-              const url = await bucketFile.getSignedUrl({
-                action: "read",
-                expires: "03-09-2500",
-              });
-
-              file.url = url[0];
-              userProfilePic.file = await entityManager.save(Files, file);
-              user.userProfilePic = await entityManager.save(
-                UserProfilePic,
-                userProfilePic
-              );
-              client = await this.findOne({ userId }, true, entityManager);
-              return client;
-            }); 
-          } else {
-            userProfilePic = new UserProfilePic();
-            userProfilePic.user = user;
-            const file = new Files();
-            file.fileName = `${newFileName}${extname(
-              dto.userProfilePic.fileName
-            )}`;
-            const bucketFile = bucket.file(
-              `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
-            );
-            const img = Buffer.from(dto.userProfilePic.data, "base64");
-            return await bucketFile.save(img).then(async () => {
-              const url = await bucketFile.getSignedUrl({
-                action: "read",
-                expires: "03-09-2500",
-              });
-              file.url = url[0];
-              userProfilePic.file = await entityManager.save(Files, file);
-              user.userProfilePic = await entityManager.save(
-                UserProfilePic,
-                userProfilePic
-              );
-              return await this.findOne({ userId }, true, entityManager);
-            });
+            deleteFile.delete();
+          } catch (ex) {
+            console.log(ex);
           }
+          const file = userProfilePic.file;
+          file.fileName = `${newFileName}${extname(
+            dto.userProfilePic.fileName
+          )}`;
+
+          const bucketFile = bucket.file(
+            `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
+          );
+          const img = Buffer.from(dto.userProfilePic.data, "base64");
+          return await bucketFile.save(img).then(async (res) => {
+            console.log("res");
+            console.log(res);
+            const url = await bucketFile.getSignedUrl({
+              action: "read",
+              expires: "03-09-2500",
+            });
+
+            file.url = url[0];
+            userProfilePic.file = await entityManager.save(Files, file);
+            user.userProfilePic = await entityManager.save(
+              UserProfilePic,
+              userProfilePic
+            );
+            client = await this.findOne({ userId }, true, entityManager);
+            return client;
+          });
+        } else {
+          userProfilePic = new UserProfilePic();
+          userProfilePic.user = user;
+          const file = new Files();
+          file.fileName = `${newFileName}${extname(
+            dto.userProfilePic.fileName
+          )}`;
+          const bucketFile = bucket.file(
+            `profile/${newFileName}${extname(dto.userProfilePic.fileName)}`
+          );
+          const img = Buffer.from(dto.userProfilePic.data, "base64");
+          return await bucketFile.save(img).then(async () => {
+            const url = await bucketFile.getSignedUrl({
+              action: "read",
+              expires: "03-09-2500",
+            });
+            file.url = url[0];
+            userProfilePic.file = await entityManager.save(Files, file);
+            user.userProfilePic = await entityManager.save(
+              UserProfilePic,
+              userProfilePic
+            );
+            return await this.findOne({ userId }, true, entityManager);
+          });
         }
-      });
+      }
+    });
   }
 
   async updateStaffUser(userDto: UpdateStaffUserDto) {
     const userId = userDto.userId;
 
     return await this.userRepo.manager.transaction(async (entityManager) => {
-      let staff: any = await this.findOne(
+      let staff: Staff = await this.findOne(
         {
           userId,
           userType: { userTypeId: "1" },
@@ -608,12 +612,9 @@ export class UsersService {
         Number(userDto.roleId)
       );
       user = await entityManager.save(Users, user);
-      staff.firstName = userDto.firstName;
-      staff.middleName = userDto.middleName;
-      staff.lastName = userDto.lastName;
+      staff.name = userDto.name;
       staff.email = userDto.email;
       staff.mobileNumber = userDto.mobileNumber;
-      staff.address = userDto.address;
       staff.gender = new Gender();
       staff.gender.genderId = userDto.genderId;
 
@@ -637,7 +638,7 @@ export class UsersService {
           file.fileName = `${newFileName}${extname(
             userDto.userProfilePic.fileName
           )}`;
-          
+
           const bucketFile = bucket.file(
             `profile/${newFileName}${extname(userDto.userProfilePic.fileName)}`
           );
@@ -650,15 +651,14 @@ export class UsersService {
             file.url = url[0];
             userProfilePic.file = await entityManager.save(Files, file);
           });
-        } 
-        else {
+        } else {
           userProfilePic = new UserProfilePic();
           userProfilePic.user = user;
           const file = new Files();
           file.fileName = `${newFileName}${extname(
             userDto.userProfilePic.fileName
           )}`;
-          
+
           const bucketFile = bucket.file(
             `profile/${newFileName}${extname(userDto.userProfilePic.fileName)}`
           );

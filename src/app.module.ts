@@ -14,6 +14,7 @@ import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provid
 import { SchedulerModule } from "./controller/scheduler/scheduler.module";
 import { ReminderModule } from "./controller/reminder/reminder.module";
 import * as Joi from "@hapi/joi";
+import { ReservationModule } from "./controller/reservation/reservation.module";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -27,14 +28,14 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     TypeOrmModule.forRootAsync({ useClass: TypeOrmConfigService }),
     AuthModule,
     UsersModule,
+    ReservationModule,
     RolesModule,
     FileModule,
     MessageModule,
-    MessageModule,
     DashboardModule,
     FirebaseProviderModule,
-    SchedulerModule,
-    ReminderModule,
+    // SchedulerModule,
+    // ReminderModule,
   ],
   providers: [AppService],
   controllers: [],
