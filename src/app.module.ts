@@ -11,10 +11,9 @@ import { FileModule } from "./controller/file/file.module";
 import { MessageModule } from "./controller/message/message.module";
 import { DashboardModule } from "./controller/dashboard/dashboard.module";
 import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provider.module";
-import { SchedulerModule } from "./controller/scheduler/scheduler.module";
-import { ReminderModule } from "./controller/reminder/reminder.module";
 import * as Joi from "@hapi/joi";
 import { ReservationModule } from "./controller/reservation/reservation.module";
+import { RequestModule } from "./controller/request/request.module";
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -34,8 +33,8 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     MessageModule,
     DashboardModule,
     FirebaseProviderModule,
-    // SchedulerModule,
-    // ReminderModule,
+    ReservationModule,
+    RequestModule,
   ],
   providers: [AppService],
   controllers: [],

@@ -6,8 +6,8 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Clients } from "./Clients";
 import { ReservationStatus } from "./ReservationStatus";
+import { Clients } from "./Clients";
 import { ReservationType } from "./ReservationType";
 
 @Index("PK_Reservation", ["reservationId"], { unique: true })
@@ -31,10 +31,6 @@ export class Reservation {
   @Column("nvarchar", { name: "AdminRemarks", nullable: true })
   adminRemarks: string | null;
 
-  @ManyToOne(() => Clients, (clients) => clients.reservations)
-  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
-  client: Clients;
-
   @ManyToOne(
     () => ReservationStatus,
     (reservationStatus) => reservationStatus.reservations
@@ -46,6 +42,10 @@ export class Reservation {
     },
   ])
   reservationStatus: ReservationStatus;
+
+  @ManyToOne(() => Clients, (clients) => clients.reservations)
+  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
+  client: Clients;
 
   @ManyToOne(
     () => ReservationType,

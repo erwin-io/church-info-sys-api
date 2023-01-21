@@ -19,17 +19,17 @@ export class Request {
   @Column("date", { name: "RequestDate" })
   requestDate: Date;
 
-  @Column("nvarchar", { name: "RequestersFirstName", length: 250 })
-  requestersFirstName: string;
+  @Column("nvarchar", { name: "RequestersFullName" })
+  requestersFullName: string;
 
-  @Column("nvarchar", { name: "RequestersMiddleName", nullable: true })
-  requestersMiddleName: string | null;
+  @Column("nvarchar", { name: "HusbandFullName", nullable: true })
+  husbandFullName: string | null;
 
-  @Column("nvarchar", { name: "RequestersLastName", length: 250 })
-  requestersLastName: string;
+  @Column("nvarchar", { name: "WifeFullName", nullable: true })
+  wifeFullName: string | null;
 
-  @Column("date", { name: "RequestersDateBaptized" })
-  requestersDateBaptized: Date;
+  @Column("date", { name: "ReferenceDate" })
+  referenceDate: Date;
 
   @Column("nvarchar", { name: "Remarks", nullable: true })
   remarks: string | null;
