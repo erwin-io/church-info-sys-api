@@ -8,7 +8,6 @@ import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "./controller/auth/auth.module";
 import { RolesModule } from "./controller/roles/roles.module";
 import { FileModule } from "./controller/file/file.module";
-import { MessageModule } from "./controller/message/message.module";
 import { DashboardModule } from "./controller/dashboard/dashboard.module";
 import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provider.module";
 import * as Joi from "@hapi/joi";
@@ -30,7 +29,6 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     ReservationModule,
     RolesModule,
     FileModule,
-    MessageModule,
     DashboardModule,
     FirebaseProviderModule,
     ReservationModule,

@@ -1,7 +1,11 @@
 import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
-import { CreateRequestDto } from "src/core/dto/request/request.create.dto";
+import {
+  CreateBaptismalCertificateRequestDto,
+  CreateConfirmationCertificateRequesDto,
+  CreateMarriageContractCertificateRequesDto,
+} from "src/core/dto/request/request.create.dto";
 import { UpdateRequestStatusDto } from "src/core/dto/request/request.update.dtos";
 import { RequestService } from "src/services/request.service";
 
@@ -95,28 +99,17 @@ export class RequestController {
     }
   }
 
-  @Get("getRequestForADay/:date")
+  @Post("createBaptismalCertificateRequest")
   //@UseGuards(JwtAuthGuard)
-  async getRequestForADay(@Param("date") dateString: string) {
-    const res: CustomResponse = {};
-    try {
-      res.data = await this.requestService.getRequestForADay(dateString);
-      res.success = true;
-      return res;
-    } catch (e) {
-      res.success = false;
-      res.message = e.message !== undefined ? e.message : e;
-      return res;
-    }
-  }
-
-  @Post("createRequest")
-  //@UseGuards(JwtAuthGuard)
-  async createRequest(@Body() dto: CreateRequestDto) {
+  async createBaptismalCertificateRequest(
+    @Body() dto: CreateBaptismalCertificateRequestDto
+  ) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
-      res.data = await this.requestService.createRequest(dto);
+      res.data = await this.requestService.createBaptismalCertificateRequest(
+        dto
+      );
       res.success = true;
       return res;
     } catch (e) {
@@ -126,7 +119,45 @@ export class RequestController {
     }
   }
 
-  @Put("    ")
+  @Post("createConfirmationCertificateReques")
+  //@UseGuards(JwtAuthGuard)
+  async createConfirmationCertificateReques(
+    @Body() dto: CreateConfirmationCertificateRequesDto
+  ) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.requestService.createConfirmationCertificateReques(
+        dto
+      );
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Post("createMarriageContractCertificateReques")
+  //@UseGuards(JwtAuthGuard)
+  async createMarriageContractCertificateReques(
+    @Body() dto: CreateMarriageContractCertificateRequesDto
+  ) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.requestService.createMarriageContractCertificateReques(dto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+
+  @Put("updateRequestStatus")
   //@UseGuards(JwtAuthGuard)
   async updateRequestStatus(@Body() dto: UpdateRequestStatusDto) {
     const res: CustomResponse = {};

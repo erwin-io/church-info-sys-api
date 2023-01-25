@@ -6,8 +6,10 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { ReservationStatus } from "./ReservationStatus";
+import { MassCategory } from "./MassCategory";
+import { MassIntentionType } from "./MassIntentionType";
 import { Clients } from "./Clients";
+import { ReservationStatus } from "./ReservationStatus";
 import { ReservationType } from "./ReservationType";
 
 @Index("PK_Reservation", ["reservationId"], { unique: true })
@@ -31,6 +33,28 @@ export class Reservation {
   @Column("nvarchar", { name: "AdminRemarks", nullable: true })
   adminRemarks: string | null;
 
+  @ManyToOne(() => MassCategory, (massCategory) => massCategory.reservations)
+  @JoinColumn([
+    { name: "MassCategoryId", referencedColumnName: "massCategoryId" },
+  ])
+  massCategory: MassCategory;
+
+  @ManyToOne(
+    () => MassIntentionType,
+    (massIntentionType) => massIntentionType.reservations
+  )
+  @JoinColumn([
+    {
+      name: "MassIntentionTypeId",
+      referencedColumnName: "massIntentionTypeId",
+    },
+  ])
+  massIntentionType: MassIntentionType;
+
+  @ManyToOne(() => Clients, (clients) => clients.reservations)
+  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
+  client: Clients;
+
   @ManyToOne(
     () => ReservationStatus,
     (reservationStatus) => reservationStatus.reservations
@@ -42,10 +66,6 @@ export class Reservation {
     },
   ])
   reservationStatus: ReservationStatus;
-
-  @ManyToOne(() => Clients, (clients) => clients.reservations)
-  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
-  client: Clients;
 
   @ManyToOne(
     () => ReservationType,

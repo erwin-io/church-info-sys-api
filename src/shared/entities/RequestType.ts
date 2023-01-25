@@ -1,16 +1,10 @@
-import {
-  Column,
-  Entity,
-  Index,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { Column, Entity, Index, OneToMany } from "typeorm";
 import { Request } from "./Request";
 
 @Index("PK_RequestType", ["requestTypeId"], { unique: true })
 @Entity("RequestType", { schema: "dbo" })
 export class RequestType {
-  @PrimaryGeneratedColumn({ type: "bigint", name: "RequestTypeId" })
+  @Column("bigint", { primary: true, name: "RequestTypeId" })
   requestTypeId: string;
 
   @Column("nvarchar", { name: "Name", length: 250 })

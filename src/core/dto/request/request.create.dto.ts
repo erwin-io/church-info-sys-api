@@ -7,8 +7,7 @@ import {
   IsOptional,
 } from "class-validator";
 import * as moment from "moment";
-
-export class CreateRequestDto {
+export class CreateBaptismalCertificateRequestDto {
   @ApiProperty({
     type: Date,
     default: moment().format("YYYY-MM-DD"),
@@ -17,27 +16,68 @@ export class CreateRequestDto {
   @Type(() => Date)
   @Transform((value) => moment(new Date(value.value)).format("YYYY-MM-DD"))
   @IsNotEmpty()
-  referenceDate: Date;
+  dateBaptized: Date;
   
   @ApiProperty()
   @IsNotEmpty()
   requestersFullName: string;
-  
-  @ApiProperty()
-  @IsOptional()
-  husbandFullName: string;
-  
-  @ApiProperty()
-  @IsOptional()
-  wifeFullName: string;
 
   @ApiProperty()
   @IsNotEmpty()
   clientId: string;
 
   @ApiProperty()
+  @IsOptional()
+  remarks: string;
+}
+
+export class CreateConfirmationCertificateRequesDto {
+  @ApiProperty({
+    type: Date,
+    default: moment().format("YYYY-MM-DD"),
+  })
+  @IsDateString()
+  @Type(() => Date)
+  @Transform((value) => moment(new Date(value.value)).format("YYYY-MM-DD"))
   @IsNotEmpty()
-  requestTypeId: string;
+  dateOfConfirmation: Date;
+  
+  @ApiProperty()
+  @IsNotEmpty()
+  requestersFullName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  clientId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  remarks: string;
+}
+
+export class CreateMarriageContractCertificateRequesDto {
+  @ApiProperty({
+    type: Date,
+    default: moment().format("YYYY-MM-DD"),
+  })
+  @IsDateString()
+  @Type(() => Date)
+  @Transform((value) => moment(new Date(value.value)).format("YYYY-MM-DD"))
+  @IsNotEmpty()
+  dateMarried: Date;
+  
+  @ApiProperty()
+  @IsNotEmpty()
+  husbandFullName: string;
+  
+  @ApiProperty()
+  @IsNotEmpty()
+  wifeFullName: string;
+
+
+  @ApiProperty()
+  @IsNotEmpty()
+  clientId: string;
 
   @ApiProperty()
   @IsOptional()

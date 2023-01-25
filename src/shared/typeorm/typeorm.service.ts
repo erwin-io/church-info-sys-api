@@ -20,6 +20,8 @@ import { RequestStatus } from "../entities/RequestStatus";
 import { Reservation } from "../entities/Reservation";
 import { ReservationType } from "../entities/ReservationType";
 import { ReservationStatus } from "../entities/ReservationStatus";
+import { MassCategory } from "../entities/MassCategory";
+import { MassIntentionType } from "../entities/MassIntentionType";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -54,6 +56,8 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         Reservation,
         ReservationType,
         ReservationStatus,
+        MassCategory,
+        MassIntentionType,
       ],
       synchronize: false, // never use TRUE in production!
       options: { encrypt: false },
