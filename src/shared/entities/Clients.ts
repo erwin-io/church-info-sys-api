@@ -7,8 +7,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Gender } from "./Gender";
 import { Users } from "./Users";
+import { Gender } from "./Gender";
 import { Notifications } from "./Notifications";
 import { Request } from "./Request";
 import { Reservation } from "./Reservation";
@@ -49,13 +49,13 @@ export class Clients {
   @Column("bigint", { name: "NumberOfCancelledAttempt", default: () => "(0)" })
   numberOfCancelledAttempt: string;
 
-  @ManyToOne(() => Gender, (gender) => gender.clients)
-  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
-  gender: Gender;
-
   @ManyToOne(() => Users, (users) => users.clients)
   @JoinColumn([{ name: "UserId", referencedColumnName: "userId" }])
   user: Users;
+
+  @ManyToOne(() => Gender, (gender) => gender.clients)
+  @JoinColumn([{ name: "GenderId", referencedColumnName: "genderId" }])
+  gender: Gender;
 
   @OneToMany(() => Notifications, (notifications) => notifications.client)
   notifications: Notifications[];

@@ -9,6 +9,10 @@ export class ReservationViewModel {
   reservationId: string;
   reservationDate: Date;
   time: string;
+  firstName: string;
+  lastName: string;
+  weddingWifeName: string;
+  weddingHusbandName: string;
   remarks: string;
   isCancelledByAdmin: boolean;
   adminRemarks: string;
@@ -24,6 +28,10 @@ export class ReservationViewModel {
     this.reservationId = model.reservationId;
     this.reservationDate = model.reservationDate;
     this.time = model.time;
+    this.firstName = model.firstName;
+    this.lastName = model.lastName;
+    this.weddingWifeName = model.weddingWifeName;
+    this.weddingHusbandName = model.weddingHusbandName;
     this.remarks = model.remarks;
     this.reservationType = model.reservationType;
     this.isCancelledByAdmin = model.isCancelledByAdmin;

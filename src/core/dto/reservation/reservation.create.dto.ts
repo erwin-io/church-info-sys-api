@@ -22,6 +22,22 @@ export class CreateReservationDto {
   time: string;
 
   @ApiProperty()
+  @IsOptional()
+  firstName: string;
+
+  @ApiProperty()
+  @IsOptional()
+  lastName: string;
+
+  @ApiProperty()
+  @IsOptional()
+  weddingWifeName: string;
+
+  @ApiProperty()
+  @IsOptional()
+  weddingHusbandName: string;
+
+  @ApiProperty()
   @IsNotEmpty()
   clientId: string;
 

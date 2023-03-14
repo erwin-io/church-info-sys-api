@@ -244,6 +244,10 @@ export class ReservationService {
           newReservation.massIntentionType = massIntentionType;
 
           newReservation.remarks = dto.remarks;
+          newReservation.firstName = dto.firstName;
+          newReservation.lastName = dto.lastName;
+          newReservation.weddingWifeName = dto.weddingWifeName;
+          newReservation.weddingHusbandName = dto.weddingHusbandName;
           newReservation.client = await entityManager.findOne(Clients, {
             where: { clientId: dto.clientId },
           });
