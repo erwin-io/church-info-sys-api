@@ -22,6 +22,8 @@ import { ReservationType } from "../entities/ReservationType";
 import { ReservationStatus } from "../entities/ReservationStatus";
 import { MassCategory } from "../entities/MassCategory";
 import { MassIntentionType } from "../entities/MassIntentionType";
+import { Relationship } from "../entities/Relationship";
+import { Priest } from "../entities/Priest";
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -29,10 +31,12 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
   private readonly config: ConfigService;
 
   public createTypeOrmOptions(): TypeOrmModuleOptions {
-    return {
-      type: "mssql",
+    
+    const ssl = this.config.get<string>("SSL");
+    let config: TypeOrmModuleOptions = {
+      type: "postgres",
       host: this.config.get<string>("DATABASE_HOST"),
-      // port: Number(this.config.get<number>("DATABASE_PORT")),
+      port: Number(this.config.get<number>("DATABASE_PORT")),
       database: this.config.get<string>("DATABASE_NAME"),
       username: this.config.get<string>("DATABASE_USER"),
       password: this.config.get<string>("DATABASE_PASSWORD"),
@@ -58,9 +62,21 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
         ReservationStatus,
         MassCategory,
         MassIntentionType,
+        Relationship,
+        Priest
       ],
-      synchronize: false, // never use TRUE in production!
-      options: { encrypt: false },
-    };
+      synchronize: false,// never use TRUE in production!
+      ssl: ssl.toLocaleLowerCase().includes("true"),
+      extra: {
+
+      }
+    }
+    if(config.ssl) {
+      config.extra.ssl = {
+        require: true,
+        rejectUnauthorized: false,
+      }
+    }
+    return config;
   }
 }

@@ -4,12 +4,13 @@ import { Reservation } from "src/shared/entities/Reservation";
 import { ReservationType } from "src/shared/entities/ReservationType";
 import { ClientViewModel } from "./client.view-model";
 import { ReservationStatusViewModel } from "./reservation-status.view-model";
+import { Priest } from "src/shared/entities/Priest";
 
 export class ReservationViewModel {
   reservationId: string;
-  reservationDate: Date;
+  reservationDate: string;
   time: string;
-  firstName: string;
+  fullName: string;
   lastName: string;
   weddingWifeName: string;
   weddingHusbandName: string;
@@ -21,6 +22,7 @@ export class ReservationViewModel {
   reservationStatus: ReservationStatusViewModel;
   massCategory: MassCategoryViewModel;
   massIntentionType: MassIntentionTypeViewModel;
+  priest: PriestViewModel;
   constructor(model: Reservation | undefined) {
     if (!model || model === null) {
       return null;
@@ -28,8 +30,7 @@ export class ReservationViewModel {
     this.reservationId = model.reservationId;
     this.reservationDate = model.reservationDate;
     this.time = model.time;
-    this.firstName = model.firstName;
-    this.lastName = model.lastName;
+    this.fullName = model.fullName;
     this.weddingWifeName = model.weddingWifeName;
     this.weddingHusbandName = model.weddingHusbandName;
     this.remarks = model.remarks;
@@ -40,6 +41,7 @@ export class ReservationViewModel {
     this.reservationStatus = model.reservationStatus;
     this.massCategory = model.massCategory;
     this.massIntentionType = model.massIntentionType;
+    this.priest = model.priest;
   }
 }
 
@@ -76,5 +78,17 @@ export class MassIntentionTypeViewModel {
     }
     this.massIntentionTypeId = model.massIntentionTypeId;
     this.name = model.name;
+  }
+}
+
+export class PriestViewModel {
+  priestId: string;
+  priestName: string;
+  constructor(model: Priest | undefined) {
+    if (!model || model === null) {
+      return null;
+    }
+    this.priestId = model.priestId;
+    this.priestName = model.priestId;
   }
 }

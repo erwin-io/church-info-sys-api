@@ -8,13 +8,13 @@ import {
 } from "typeorm";
 import { Users } from "./Users";
 
-@Index("PK_GatewayConnectedUsers", ["id"], { unique: true })
+@Index("pk_gatewayconnectedusers_933578364", ["id"], { unique: true })
 @Entity("GatewayConnectedUsers", { schema: "dbo" })
 export class GatewayConnectedUsers {
   @PrimaryGeneratedColumn({ type: "bigint", name: "Id" })
   id: string;
 
-  @Column("nvarchar", { name: "SocketId", length: 100 })
+  @Column("character varying", { name: "SocketId", length: 100 })
   socketId: string;
 
   @ManyToOne(() => Users, (users) => users.gatewayConnectedUsers)

@@ -17,6 +17,7 @@ import { ReservationStatus } from "src/shared/entities/ReservationStatus";
 import { Repository } from "typeorm";
 import { MassCategory } from "src/shared/entities/MassCategory";
 import { MassIntentionType } from "src/shared/entities/MassIntentionType";
+import { Priest } from "src/shared/entities/Priest";
 
 @Injectable()
 export class ReservationService {
@@ -52,6 +53,7 @@ export class ReservationService {
         .leftJoinAndSelect("r.reservationStatus", "rs")
         .leftJoinAndSelect("r.massCategory", "mc")
         .leftJoinAndSelect("r.massIntentionType", "mit")
+        .leftJoinAndSelect("r.priest", "p")
         .leftJoinAndSelect("r.client", "c");
       if (advanceSearch) {
         if (
@@ -71,7 +73,7 @@ export class ReservationService {
             moment(reservationDateTo).format("YYYY-MM-DD");
         }
         query.andWhere(
-          "CONCAT(c.firstName, ' ', c.middleName, ' ', c.lastName) LIKE :clientName"
+          "(CONCAT(c.firstName, ' ', c.middleName, ' ', c.lastName) LIKE :clientName OR CONCAT(r.fullName) LIKE :clientName) LIKE :clientName"
         );
         if (reservationType.length > 0) {
           query = query.andWhere("rt.name IN(:...reservationType)");
@@ -83,12 +85,12 @@ export class ReservationService {
           .addOrderBy("r.reservationDate", "ASC");
       } else {
         query = query
-          .where("r.reservationStatusId like :keyword")
-          .orWhere("r.reservationDate like :keyword")
-          .orWhere("rt.name like :keyword")
-          .andWhere(
-            "CONCAT(c.firstName, ' ', c.middleName, ' ', c.lastName) LIKE :keyword"
-          )
+          .where(
+            "LOWER(cast(r.reservationId as character varying)) like :keyword OR " + 
+            "LOWER(cast(r.reservationDate as character varying)) like :keyword OR " + 
+            "CONCAT(LOWER(c.firstName), ' ', LOWER(c.lastName)) LIKE :keyword OR " + 
+            "CONCAT(LOWER(r.fullName) LIKE :clientName) LIKE :keyword"
+            )
           .orderBy("rs.reservationStatusId", "ASC")
           .addOrderBy("r.reservationDate", "ASC");
       }
@@ -120,6 +122,7 @@ export class ReservationService {
         .leftJoinAndSelect("r.massCategory", "mc")
         .leftJoinAndSelect("r.massIntentionType", "mit")
         .leftJoinAndSelect("r.client", "c")
+        .leftJoinAndSelect("r.priest", "p")
         .where("c.clientId = :clientId")
         .andWhere("rs.name IN(:...status)")
         .setParameters(params);
@@ -145,6 +148,7 @@ export class ReservationService {
           .leftJoinAndSelect("r.massCategory", "mc")
           .leftJoinAndSelect("r.massIntentionType", "mit")
           .leftJoinAndSelect("r.client", "c")
+          .leftJoinAndSelect("r.priest", "p")
           .leftJoinAndSelect("c.user", "u")
           .where(options)
           .getOne()
@@ -180,6 +184,7 @@ export class ReservationService {
       const query = await this.appointmentRepo.manager
         .createQueryBuilder("Reservation", "r")
         .leftJoinAndSelect("r.reservationStatus", "rs")
+        .leftJoinAndSelect("r.priest", "p")
         .where("r.reservationDate between :from and :to", dateFilter)
         .andWhere("rs.name IN(:...status)", {
           status: ["Pending", "Approved"],
@@ -203,7 +208,7 @@ export class ReservationService {
               dto.time
             }`
           ).format("YYYY-MM-DD h:mm:ss a");
-          newReservation.reservationDate = new Date(reservationDate);
+          newReservation.reservationDate = moment(reservationDate).format("YYYY-MM-DD");
           newReservation.time = moment(new Date(reservationDate)).format(
             "h:mm:ss a"
           );
@@ -237,15 +242,28 @@ export class ReservationService {
           );
           if (!massIntentionType) {
             throw new HttpException(
-              "Intention type type not found!",
+              "Intention type not found!",
               HttpStatus.BAD_REQUEST
             );
           }
           newReservation.massIntentionType = massIntentionType;
 
+          const priest = await entityManager.findOne(
+            Priest,
+            {
+              where: { priestId: dto.priestId },
+            }
+          );
+          if (!massIntentionType) {
+            throw new HttpException(
+              "Priest not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          newReservation.priest = priest;
+
           newReservation.remarks = dto.remarks;
-          newReservation.firstName = dto.firstName;
-          newReservation.lastName = dto.lastName;
+          newReservation.fullName = dto.fullName;
           newReservation.weddingWifeName = dto.weddingWifeName;
           newReservation.weddingHusbandName = dto.weddingHusbandName;
           newReservation.client = await entityManager.findOne(Clients, {
@@ -282,7 +300,7 @@ export class ReservationService {
               dto.time
             }`
           ).format("YYYY-MM-DD h:mm:ss a");
-          reservation.reservationDate = new Date(reservationDate);
+          reservation.reservationDate = moment(reservationDate).format("YYYY-MM-DD");
           reservation.time = moment(new Date(reservationDate)).format(
             "h:mm:ss a"
           );

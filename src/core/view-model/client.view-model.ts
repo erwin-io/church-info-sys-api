@@ -13,7 +13,7 @@ export class ClientViewModel {
   fullName: string;
   gender: GenderViewModel;
   user: UserViewModel;
-  birthDate: Date;
+  birthDate: string;
   age: string;
   constructor(model: Clients | undefined) {
     if (!model || model === null) {

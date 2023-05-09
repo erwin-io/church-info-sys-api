@@ -8,7 +8,7 @@ import {
 } from "typeorm";
 import { Users } from "./Users";
 
-@Index("PK_Messages", ["messageId"], { unique: true })
+@Index("pk_messages_997578592", ["messageId"], { unique: true })
 @Entity("Messages", { schema: "dbo" })
 export class Messages {
   @PrimaryGeneratedColumn({ type: "bigint", name: "MessageId" })
@@ -17,10 +17,10 @@ export class Messages {
   @Column("text", { name: "Message" })
   message: string;
 
-  @Column("datetime", { name: "DateTime" })
+  @Column("timestamp without time zone", { name: "DateTime" })
   dateTime: Date;
 
-  @Column("bit", { name: "IsClient", default: () => "(0)" })
+  @Column("boolean", { name: "IsClient", default: () => "false" })
   isClient: boolean;
 
   @ManyToOne(() => Users, (users) => users.messages)

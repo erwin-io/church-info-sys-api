@@ -8,23 +8,28 @@ import {
 } from "typeorm";
 import { EntityStatus } from "./EntityStatus";
 
-@Index("PK_ReminderI", ["reminderId"], { unique: true })
+@Index("pk_reminder_1365579903", ["reminderId"], { unique: true })
 @Entity("Reminder", { schema: "dbo" })
 export class Reminder {
   @PrimaryGeneratedColumn({ type: "bigint", name: "ReminderId" })
   reminderId: string;
 
-  @Column("nvarchar", { name: "Title", length: 250 })
+  @Column("character varying", { name: "Title", length: 250 })
   title: string;
 
-  @Column("nvarchar", { name: "Description" })
+  @Column("text", { name: "Description" })
   description: string;
 
-  @Column("datetime", { name: "DueDate" })
+  @Column("timestamp without time zone", { name: "DueDate" })
   dueDate: Date;
 
-  @Column("bit", { name: "Delivered", default: () => "(0)" })
-  delivered: boolean;
+  @Column("numeric", {
+    name: "Delivered",
+    precision: 1,
+    scale: 0,
+    default: () => "0",
+  })
+  delivered: string;
 
   @ManyToOne(() => EntityStatus, (entityStatus) => entityStatus.reminders)
   @JoinColumn([

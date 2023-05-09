@@ -11,7 +11,8 @@ import { Request } from "src/shared/entities/Request";
 import { Repository } from "typeorm";
 import { ReminderService } from "./reminder.service";
 import { RequestStatusEnum } from "src/common/enums/request-status.enum";
-import { CreateBaptismalCertificateRequestDto, CreateConfirmationCertificateRequesDto, CreateMarriageContractCertificateRequesDto } from "src/core/dto/request/request.create.dto";
+import { CreateBaptismalCertificateRequestDto, CreateCertificateRequestDto, CreateConfirmationCertificateRequestDto, CreateMarriageContractCertificateRequestDto } from "src/core/dto/request/request.create.dto";
+import { Relationship } from "src/shared/entities/Relationship";
 
 @Injectable()
 export class RequestService {
@@ -70,11 +71,11 @@ export class RequestService {
         }
       } else {
         query = query
-          .where("r.requestStatusId like :keyword")
-          .orWhere("r.requestDate like :keyword")
-          .orWhere("rt.name like :keyword")
+          .where("LOWER(cast(r.requestId as character varying)) like :keyword")
+          .orWhere("LOWER(cast(r.requestDate as character varying)) like :keyword")
+          .orWhere("LOWER(rt.name) like :keyword")
           .andWhere(
-            "CONCAT(c.firstName, ' ', c.middleName, ' ', c.lastName) LIKE :keyword"
+            "CONCAT(LOWER(c.firstName), ' ', LOWER(c.lastName)) LIKE :keyword"
           );
       }
 
@@ -158,7 +159,7 @@ export class RequestService {
       return await this.appointmentRepo.manager.transaction(
         async (entityManager) => {
           const newRequest = new Request();
-          newRequest.requestDate = new Date();
+          newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
           const requestType = await entityManager.findOne(RequestType, {
             where: { requestTypeId: "1" },
           });
@@ -169,8 +170,18 @@ export class RequestService {
             );
           }
           newRequest.requestType = requestType;
+          const relationship = await entityManager.findOne(Relationship, {
+            where: { relationshipId: dto.relationshipId },
+          });
+          if (!relationship) {
+            throw new HttpException(
+              "Relationship not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          newRequest.relationship = relationship;
           newRequest.requestersFullName = dto.requestersFullName;
-          newRequest.referenceDate = dto.dateBaptized;
+          newRequest.referenceDate = moment(dto.dateBaptized).format("YYYY-MM-DD");
           newRequest.remarks = dto.remarks;
           newRequest.client = await entityManager.findOne(Clients, {
             where: { clientId: dto.clientId },
@@ -183,14 +194,14 @@ export class RequestService {
     }
   }
 
-  async createConfirmationCertificateReques(
-    dto: CreateConfirmationCertificateRequesDto
+  async createConfirmationCertificateRequest(
+    dto: CreateConfirmationCertificateRequestDto
   ) {
     try {
       return await this.appointmentRepo.manager.transaction(
         async (entityManager) => {
           const newRequest = new Request();
-          newRequest.requestDate = new Date();
+          newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
           const requestType = await entityManager.findOne(RequestType, {
             where: { requestTypeId: "2" },
           });
@@ -201,8 +212,18 @@ export class RequestService {
             );
           }
           newRequest.requestType = requestType;
+          const relationship = await entityManager.findOne(Relationship, {
+            where: { relationshipId: dto.relationshipId },
+          });
+          if (!relationship) {
+            throw new HttpException(
+              "Relationship not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          newRequest.relationship = relationship;
           newRequest.requestersFullName = dto.requestersFullName;
-          newRequest.referenceDate = dto.dateOfConfirmation;
+          newRequest.referenceDate = moment(dto.dateOfConfirmation).format("YYYY-MM-DD");
           newRequest.remarks = dto.remarks;
           newRequest.client = await entityManager.findOne(Clients, {
             where: { clientId: dto.clientId },
@@ -215,14 +236,14 @@ export class RequestService {
     }
   }
 
-  async createMarriageContractCertificateReques(
-    dto: CreateMarriageContractCertificateRequesDto
+  async createMarriageContractCertificateRequest(
+    dto: CreateMarriageContractCertificateRequestDto
   ) {
     try {
       return await this.appointmentRepo.manager.transaction(
         async (entityManager) => {
           const newRequest = new Request();
-          newRequest.requestDate = new Date();
+          newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
           const requestType = await entityManager.findOne(RequestType, {
             where: { requestTypeId: "3" },
           });
@@ -233,9 +254,61 @@ export class RequestService {
             );
           }
           newRequest.requestType = requestType;
+          const relationship = await entityManager.findOne(Relationship, {
+            where: { relationshipId: dto.relationshipId },
+          });
+          if (!relationship) {
+            throw new HttpException(
+              "Relationship not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          newRequest.relationship = relationship;
           newRequest.husbandFullName = dto.husbandFullName;
           newRequest.wifeFullName = dto.wifeFullName;
-          newRequest.referenceDate = dto.dateMarried;
+          newRequest.referenceDate = moment(dto.dateMarried).format("YYYY-MM-DD");
+          newRequest.remarks = dto.remarks;
+          newRequest.client = await entityManager.findOne(Clients, {
+            where: { clientId: dto.clientId },
+          });
+          return await entityManager.save(Request, newRequest);
+        }
+      );
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  async createCertificateRequest(
+    dto: CreateCertificateRequestDto
+  ) {
+    try {
+      return await this.appointmentRepo.manager.transaction(
+        async (entityManager) => {
+          const newRequest = new Request();
+          newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
+          const requestType = await entityManager.findOne(RequestType, {
+            where: { requestTypeId: "3" },
+          });
+          if (!requestType) {
+            throw new HttpException(
+              "Request type not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          newRequest.requestType = requestType;
+          const relationship = await entityManager.findOne(Relationship, {
+            where: { relationshipId: dto.relationshipId },
+          });
+          if (!relationship) {
+            throw new HttpException(
+              "Relationship not found!",
+              HttpStatus.BAD_REQUEST
+            );
+          }
+          newRequest.relationship = relationship;
+          newRequest.requestersFullName = dto.fullName;
+          newRequest.referenceDate = moment(dto.date).format("YYYY-MM-DD");
           newRequest.remarks = dto.remarks;
           newRequest.client = await entityManager.findOne(Clients, {
             where: { clientId: dto.clientId },

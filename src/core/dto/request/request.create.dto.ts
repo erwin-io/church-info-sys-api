@@ -29,9 +29,13 @@ export class CreateBaptismalCertificateRequestDto {
   @ApiProperty()
   @IsOptional()
   remarks: string;
+
+  @ApiProperty()
+  @IsOptional()
+  relationshipId: string;
 }
 
-export class CreateConfirmationCertificateRequesDto {
+export class CreateConfirmationCertificateRequestDto {
   @ApiProperty({
     type: Date,
     default: moment().format("YYYY-MM-DD"),
@@ -53,9 +57,13 @@ export class CreateConfirmationCertificateRequesDto {
   @ApiProperty()
   @IsOptional()
   remarks: string;
+
+  @ApiProperty()
+  @IsOptional()
+  relationshipId: string;
 }
 
-export class CreateMarriageContractCertificateRequesDto {
+export class CreateMarriageContractCertificateRequestDto {
   @ApiProperty({
     type: Date,
     default: moment().format("YYYY-MM-DD"),
@@ -82,4 +90,37 @@ export class CreateMarriageContractCertificateRequesDto {
   @ApiProperty()
   @IsOptional()
   remarks: string;
+
+  @ApiProperty()
+  @IsOptional()
+  relationshipId: string;
+}
+
+
+export class CreateCertificateRequestDto {
+  @ApiProperty({
+    type: Date,
+    default: moment().format("YYYY-MM-DD"),
+  })
+  @IsDateString()
+  @Type(() => Date)
+  @Transform((value) => moment(new Date(value.value)).format("YYYY-MM-DD"))
+  @IsNotEmpty()
+  date: Date;
+  
+  @ApiProperty()
+  @IsNotEmpty()
+  fullName: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  clientId: string;
+
+  @ApiProperty()
+  @IsOptional()
+  remarks: string;
+
+  @ApiProperty()
+  @IsOptional()
+  relationshipId: string;
 }
