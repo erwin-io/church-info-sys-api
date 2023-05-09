@@ -6,53 +6,60 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { RequestType } from "./RequestType";
 import { Clients } from "./Clients";
+import { Relationship } from "./Relationship";
 import { RequestStatus } from "./RequestStatus";
+import { RequestType } from "./RequestType";
 
-@Index("PK_Request", ["requestId"], { unique: true })
+@Index("Request_pkey", ["requestId"], { unique: true })
 @Entity("Request", { schema: "dbo" })
 export class Request {
   @PrimaryGeneratedColumn({ type: "bigint", name: "RequestId" })
   requestId: string;
 
   @Column("date", { name: "RequestDate" })
-  requestDate: Date;
+  requestDate: string;
 
-  @Column("nvarchar", { name: "RequestersFullName", nullable: true })
+  @Column("character varying", { name: "RequestersFullName", nullable: true })
   requestersFullName: string | null;
 
-  @Column("nvarchar", { name: "HusbandFullName", nullable: true })
+  @Column("character varying", { name: "HusbandFullName", nullable: true })
   husbandFullName: string | null;
 
-  @Column("nvarchar", { name: "WifeFullName", nullable: true })
+  @Column("character varying", { name: "WifeFullName", nullable: true })
   wifeFullName: string | null;
 
   @Column("date", { name: "ReferenceDate" })
-  referenceDate: Date;
+  referenceDate: string;
 
-  @Column("nvarchar", { name: "Remarks", nullable: true })
+  @Column("character varying", { name: "Remarks", nullable: true })
   remarks: string | null;
 
-  @Column("bit", { name: "IsCancelledByAdmin", default: () => "(0)" })
+  @Column("boolean", { name: "IsCancelledByAdmin", default: () => "false" })
   isCancelledByAdmin: boolean;
 
-  @Column("nvarchar", { name: "AdminRemarks", nullable: true })
+  @Column("character varying", { name: "AdminRemarks", nullable: true })
   adminRemarks: string | null;
-
-  @ManyToOne(() => RequestType, (requestType) => requestType.requests)
-  @JoinColumn([
-    { name: "RequestTypeId", referencedColumnName: "requestTypeId" },
-  ])
-  requestType: RequestType;
 
   @ManyToOne(() => Clients, (clients) => clients.requests)
   @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
   client: Clients;
+
+  @ManyToOne(() => Relationship, (relationship) => relationship.requests)
+  @JoinColumn([
+    { name: "RelationshipId", referencedColumnName: "relationshipId" },
+  ])
+  relationship: Relationship;
 
   @ManyToOne(() => RequestStatus, (requestStatus) => requestStatus.requests)
   @JoinColumn([
     { name: "RequestStatusId", referencedColumnName: "requestStatusId" },
   ])
   requestStatus: RequestStatus;
+
+  @ManyToOne(() => RequestType, (requestType) => requestType.requests)
+  @JoinColumn([
+    { name: "RequestTypeId", referencedColumnName: "requestTypeId" },
+  ])
+  requestType: RequestType;
 }

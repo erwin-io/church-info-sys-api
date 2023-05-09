@@ -7,16 +7,16 @@ import {
 } from "typeorm";
 import { UserProfilePic } from "./UserProfilePic";
 
-@Index("PK_Files", ["fileId"], { unique: true })
+@Index("pk_files_901578250", ["fileId"], { unique: true })
 @Entity("Files", { schema: "dbo" })
 export class Files {
   @PrimaryGeneratedColumn({ type: "bigint", name: "FileId" })
   fileId: string;
 
-  @Column("nvarchar", { name: "FileName" })
+  @Column("text", { name: "FileName" })
   fileName: string;
 
-  @Column("varchar", { name: "Url", nullable: true })
+  @Column("text", { name: "Url", nullable: true })
   url: string | null;
 
   @OneToMany(() => UserProfilePic, (userProfilePic) => userProfilePic.file)

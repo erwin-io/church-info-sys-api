@@ -4,55 +4,53 @@ import {
   Index,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { ReservationType } from "./ReservationType";
+import { Notifications } from "./Notifications";
+import { Clients } from "./Clients";
 import { MassCategory } from "./MassCategory";
 import { MassIntentionType } from "./MassIntentionType";
-import { Clients } from "./Clients";
+import { Priest } from "./Priest";
 import { ReservationStatus } from "./ReservationStatus";
+import { ReservationType } from "./ReservationType";
 
-@Index("PK_Reservation", ["reservationId"], { unique: true })
+@Index("pk_reservation_1890105774", ["reservationId"], { unique: true })
 @Entity("Reservation", { schema: "dbo" })
 export class Reservation {
   @PrimaryGeneratedColumn({ type: "bigint", name: "ReservationId" })
   reservationId: string;
 
   @Column("date", { name: "ReservationDate" })
-  reservationDate: Date;
+  reservationDate: string;
 
-  @Column("nvarchar", { name: "Time", length: 50 })
+  @Column("character varying", { name: "Time" })
   time: string;
 
-  @Column("nvarchar", { name: "FirstName", nullable: true, length: 250 })
-  firstName: string | null;
+  @Column("character varying", { name: "FullName", nullable: true })
+  fullName: string | null;
 
-  @Column("nvarchar", { name: "LastName", nullable: true, length: 250 })
-  lastName: string | null;
-
-  @Column("nvarchar", { name: "WeddingWifeName", nullable: true })
+  @Column("character varying", { name: "WeddingWifeName", nullable: true })
   weddingWifeName: string | null;
 
-  @Column("nvarchar", { name: "WeddingHusbandName", nullable: true })
+  @Column("character varying", { name: "WeddingHusbandName", nullable: true })
   weddingHusbandName: string | null;
 
-  @Column("nvarchar", { name: "Remarks", nullable: true })
+  @Column("character varying", { name: "Remarks", nullable: true })
   remarks: string | null;
 
-  @Column("bit", { name: "IsCancelledByAdmin", default: () => "(0)" })
+  @Column("boolean", { name: "IsCancelledByAdmin", default: () => "false" })
   isCancelledByAdmin: boolean;
 
-  @Column("nvarchar", { name: "AdminRemarks", nullable: true })
+  @Column("character varying", { name: "AdminRemarks", nullable: true })
   adminRemarks: string | null;
 
-  @ManyToOne(
-    () => ReservationType,
-    (reservationType) => reservationType.reservations
-  )
-  @JoinColumn([
-    { name: "ReservationTypeId", referencedColumnName: "reservationTypeId" },
-  ])
-  reservationType: ReservationType;
+  @OneToMany(() => Notifications, (notifications) => notifications.reservation)
+  notifications: Notifications[];
+
+  @ManyToOne(() => Clients, (clients) => clients.reservations)
+  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
+  client: Clients;
 
   @ManyToOne(() => MassCategory, (massCategory) => massCategory.reservations)
   @JoinColumn([
@@ -72,9 +70,9 @@ export class Reservation {
   ])
   massIntentionType: MassIntentionType;
 
-  @ManyToOne(() => Clients, (clients) => clients.reservations)
-  @JoinColumn([{ name: "ClientId", referencedColumnName: "clientId" }])
-  client: Clients;
+  @ManyToOne(() => Priest, (priest) => priest.reservations)
+  @JoinColumn([{ name: "PriestId", referencedColumnName: "priestId" }])
+  priest: Priest;
 
   @ManyToOne(
     () => ReservationStatus,
@@ -87,4 +85,13 @@ export class Reservation {
     },
   ])
   reservationStatus: ReservationStatus;
+
+  @ManyToOne(
+    () => ReservationType,
+    (reservationType) => reservationType.reservations
+  )
+  @JoinColumn([
+    { name: "ReservationTypeId", referencedColumnName: "reservationTypeId" },
+  ])
+  reservationType: ReservationType;
 }

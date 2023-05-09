@@ -13,6 +13,9 @@ import { FirebaseProviderModule } from "./core/provider/firebase/firebase-provid
 import * as Joi from "@hapi/joi";
 import { ReservationModule } from "./controller/reservation/reservation.module";
 import { RequestModule } from "./controller/request/request.module";
+import { PriestService } from './services/priest.service';
+import { PriestController } from './controller/priest/priest.controller';
+import { PriestModule } from './controller/priest/priest.module';
 const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
 @Module({
   imports: [
@@ -33,6 +36,7 @@ const envFilePath: string = getEnvPath(`${__dirname}/common/envs`);
     FirebaseProviderModule,
     ReservationModule,
     RequestModule,
+    PriestModule,
   ],
   providers: [AppService],
   controllers: [],

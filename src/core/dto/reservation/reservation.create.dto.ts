@@ -23,11 +23,7 @@ export class CreateReservationDto {
 
   @ApiProperty()
   @IsOptional()
-  firstName: string;
-
-  @ApiProperty()
-  @IsOptional()
-  lastName: string;
+  fullName: string;
 
   @ApiProperty()
   @IsOptional()
@@ -56,4 +52,8 @@ export class CreateReservationDto {
   @ApiProperty()
   @IsOptional()
   remarks: string;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  priestId: string;
 }

@@ -38,6 +38,7 @@ import { unlinkSync, writeFile } from "fs";
 import { Files } from "src/shared/entities/Files";
 import { extname, join } from "path";
 import { v4 as uuid } from "uuid";
+import moment from "moment";
 
 @Injectable()
 export class UsersService {
@@ -101,10 +102,10 @@ export class UsersService {
       query = query
         .where("s.name LIKE :name")
         .andWhere("r.name IN(:...roles)")
-        .andWhere("u.userId like :userId")
+        .andWhere("cast(u.userId as character varying) like :userId")
         .andWhere("u.username like :username")
         .andWhere("s.email like :email")
-        .andWhere("s.mobileNumber like :mobileNumber")
+        .andWhere("cast(s.mobileNumber as character varying) like :mobileNumber")
         .orderBy("u.userId", "DESC");
       params.userId = `%${userId}%`;
       params.username = `%${username}%`;
@@ -114,10 +115,10 @@ export class UsersService {
     } else {
       query = query
         .where("r.name like :keyword")
-        .orWhere("u.userId like :keyword")
+        .orWhere("cast(u.userId as character varying) like :keyword")
         .orWhere("u.username like :keyword")
         .orWhere("s.email like :keyword")
-        .orWhere("s.mobileNumber like :keyword")
+        .orWhere("cast(s.mobileNumber as character varying) like :keyword")
         .orWhere("s.name like :keyword")
         .orderBy("u.userId", "DESC");
     }
@@ -151,11 +152,11 @@ export class UsersService {
         "CONCAT(c.firstName, ' ', ISNULL(c.middleName, ''), ' ', c.lastName) LIKE :name"
       );
       query = query
-        .where("c.userId like :userId")
-        .andWhere("c.username like :username")
-        .andWhere("c.email like :email")
-        .andWhere("c.mobileNumber like :mobileNumber")
-        .orderBy("u.userId", "DESC");
+      .where("cast(u.userId as character varying) like :userId")
+      .andWhere("c.username like :username")
+      .andWhere("c.email like :email")
+      .andWhere("cast(c.mobileNumber as character varying) like :mobileNumber")
+      .orderBy("u.userId", "DESC");
       params.userId = `%${userId}%`;
       params.username = `%${username}%`;
       params.email = `%${email}%`;
@@ -163,14 +164,14 @@ export class UsersService {
       params.name = `%${name}%`;
     } else {
       query = query
-        .where("u.userId like :keyword")
-        .orWhere("u.username like :keyword")
-        .orWhere("c.email like :keyword")
-        .orWhere("c.mobileNumber like :keyword")
-        .orWhere("ISNULL(c.firstName, '') like :keyword")
-        .orWhere("ISNULL(c.middleName, '') like :keyword")
-        .orWhere("ISNULL(c.lastName, '') like :keyword")
-        .orderBy("u.userId", "DESC");
+      .where("cast(u.userId as character varying) like :keyword")
+      .orWhere("u.username like :keyword")
+      .orWhere("c.email like :keyword")
+      .orWhere("cast(c.mobileNumber as character varying) like :keyword")
+      .orWhere("COALESCE(c.firstName, '') like :keyword")
+      .orWhere("COALESCE(c.middleName, '') like :keyword")
+      .orWhere("COALESCE(c.lastName, '') like :keyword")
+      .orderBy("u.userId", "DESC");
     }
     query = query.setParameters(params);
     return (<Clients[]>await query.getMany()).map((c: Clients) => {
@@ -360,7 +361,7 @@ export class UsersService {
       client.lastName = userDto.lastName;
       client.email = userDto.email;
       client.mobileNumber = userDto.mobileNumber;
-      client.birthDate = userDto.birthDate;
+      client.birthDate = moment(userDto.birthDate).format("YYYY-MM-DD");
       client.age = await (await getAge(userDto.birthDate)).toString();
       client.address = userDto.address;
       client.gender = new Gender();
@@ -429,7 +430,7 @@ export class UsersService {
       client.email = userDto.email;
       client.mobileNumber = userDto.mobileNumber;
       client.address = userDto.address;
-      client.birthDate = userDto.birthDate;
+      client.birthDate = moment(userDto.birthDate).format("YYYY-MM-DD");
       client.age = (await getAge(userDto.birthDate)).toString();
       client.gender = new Gender();
       client.gender.genderId = userDto.genderId;

@@ -1,13 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity("migrations", { schema: "dbo" })
+@Index("pk_8c82d7f526340ab734260ea46be_1029578706", ["id"], { unique: true })
+@Entity("Migrations", { schema: "dbo" })
 export class Migrations {
-  @PrimaryGeneratedColumn({ type: "int", name: "id" })
+  @PrimaryGeneratedColumn({ type: "integer", name: "Id" })
   id: number;
 
-  @Column("bigint", { name: "timestamp" })
+  @Column("bigint", { name: "Timestamp" })
   timestamp: string;
 
-  @Column("varchar", { name: "name", length: 255 })
+  @Column("character varying", { name: "Name", length: 255 })
   name: string;
 }

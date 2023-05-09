@@ -3,8 +3,9 @@ import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
 import {
   CreateBaptismalCertificateRequestDto,
-  CreateConfirmationCertificateRequesDto,
-  CreateMarriageContractCertificateRequesDto,
+  CreateConfirmationCertificateRequestDto,
+  CreateMarriageContractCertificateRequestDto,
+  CreateCertificateRequestDto,
 } from "src/core/dto/request/request.create.dto";
 import { UpdateRequestStatusDto } from "src/core/dto/request/request.update.dtos";
 import { RequestService } from "src/services/request.service";
@@ -119,15 +120,15 @@ export class RequestController {
     }
   }
 
-  @Post("createConfirmationCertificateReques")
+  @Post("createConfirmationCertificateRequest")
   //@UseGuards(JwtAuthGuard)
-  async createConfirmationCertificateReques(
-    @Body() dto: CreateConfirmationCertificateRequesDto
+  async createConfirmationCertificateRequest(
+    @Body() dto: CreateConfirmationCertificateRequestDto
   ) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
-      res.data = await this.requestService.createConfirmationCertificateReques(
+      res.data = await this.requestService.createConfirmationCertificateRequest(
         dto
       );
       res.success = true;
@@ -139,15 +140,15 @@ export class RequestController {
     }
   }
 
-  @Post("createMarriageContractCertificateReques")
+  @Post("createMarriageContractCertificateRequest")
   //@UseGuards(JwtAuthGuard)
-  async createMarriageContractCertificateReques(
-    @Body() dto: CreateMarriageContractCertificateRequesDto
+  async createMarriageContractCertificateRequest(
+    @Body() dto: CreateMarriageContractCertificateRequestDto
   ) {
     const res: CustomResponse = {};
     try {
       const res: CustomResponse = {};
-      res.data = await this.requestService.createMarriageContractCertificateReques(dto);
+      res.data = await this.requestService.createMarriageContractCertificateRequest(dto);
       res.success = true;
       return res;
     } catch (e) {
@@ -157,6 +158,24 @@ export class RequestController {
     }
   }
 
+  @Post("createCertificateRequest")
+  //@UseGuards(JwtAuthGuard)
+  async createCertificateRequest(
+    @Body() dto: CreateCertificateRequestDto
+  ) {
+    const res: CustomResponse = {};
+    try {
+      const res: CustomResponse = {};
+      res.data = await this.requestService.createCertificateRequest(dto);
+      res.success = true;
+      return res;
+    } catch (e) {
+      res.success = false;
+      res.message = e.message !== undefined ? e.message : e;
+      return res;
+    }
+  }
+  
   @Put("updateRequestStatus")
   //@UseGuards(JwtAuthGuard)
   async updateRequestStatus(@Body() dto: UpdateRequestStatusDto) {

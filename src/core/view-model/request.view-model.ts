@@ -5,7 +5,7 @@ import { RequestStatusViewModel } from "./request-status.view-model";
 
 export class RequestViewModel {
   requestId: string;
-  requestDate: Date;
+  requestDate: string;
   remarks: string;
   isCancelledByAdmin: boolean;
   adminRemarks: string;
@@ -15,7 +15,8 @@ export class RequestViewModel {
   requestersFullName: string;
   husbandFullName: string;
   wifeFullName: string;
-  referenceDate: Date;
+  referenceDate: string;
+  relationship: RelationshipViewModel;
   constructor(model: Request | undefined) {
     if (!model || model === null) {
       return null;
@@ -32,6 +33,7 @@ export class RequestViewModel {
     this.husbandFullName = model.husbandFullName;
     this.wifeFullName = model.wifeFullName;
     this.referenceDate = model.referenceDate;
+    this.relationship = model.relationship;
   }
 }
 
@@ -45,4 +47,9 @@ export class RequestTypeViewModel {
     this.requestTypeId = model.requestTypeId;
     this.name = model.name;
   }
+}
+
+export class RelationshipViewModel {
+  relationshipId: string;
+  name: string;
 }

@@ -13,7 +13,7 @@ export class StaffViewModel {
     if (!model || model === null) {
       return null;
     }
-    this.staffid = model.staffid;
+    this.staffid = model.staffId;
     this.fullName = model.name;
     this.email = model.email;
     this.mobileNumber = model.mobileNumber;
