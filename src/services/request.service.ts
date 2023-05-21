@@ -13,6 +13,7 @@ import { ReminderService } from "./reminder.service";
 import { RequestStatusEnum } from "src/common/enums/request-status.enum";
 import { CreateBaptismalCertificateRequestDto, CreateCertificateRequestDto, CreateConfirmationCertificateRequestDto, CreateMarriageContractCertificateRequestDto } from "src/core/dto/request/request.create.dto";
 import { Relationship } from "src/shared/entities/Relationship";
+import { RequestTypeEnum } from "src/common/enums/request-type.enum";
 
 @Injectable()
 export class RequestService {
@@ -161,7 +162,7 @@ export class RequestService {
           const newRequest = new Request();
           newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
           const requestType = await entityManager.findOne(RequestType, {
-            where: { requestTypeId: "1" },
+            where: { requestTypeId: RequestTypeEnum.BAPTISMAL_CERTIFICATE.toString() },
           });
           if (!requestType) {
             throw new HttpException(
@@ -203,7 +204,7 @@ export class RequestService {
           const newRequest = new Request();
           newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
           const requestType = await entityManager.findOne(RequestType, {
-            where: { requestTypeId: "2" },
+            where: { requestTypeId: RequestTypeEnum.CONFIRMATION_CERTIFICATE.toString() },
           });
           if (!requestType) {
             throw new HttpException(
@@ -245,7 +246,7 @@ export class RequestService {
           const newRequest = new Request();
           newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
           const requestType = await entityManager.findOne(RequestType, {
-            where: { requestTypeId: "3" },
+            where: { requestTypeId: RequestTypeEnum.MARRIAGE_CERTIFICATE.toString() },
           });
           if (!requestType) {
             throw new HttpException(
@@ -288,7 +289,7 @@ export class RequestService {
           const newRequest = new Request();
           newRequest.requestDate = moment(new Date()).format("YYYY-MM-DD");
           const requestType = await entityManager.findOne(RequestType, {
-            where: { requestTypeId: "3" },
+            where: { requestTypeId: RequestTypeEnum.OTHER_CERTIFICATE.toString() },
           });
           if (!requestType) {
             throw new HttpException(
@@ -307,7 +308,7 @@ export class RequestService {
             );
           }
           newRequest.relationship = relationship;
-          newRequest.requestersFullName = dto.fullName;
+          newRequest.requestersFullName = dto.requestersFullName;
           newRequest.referenceDate = moment(dto.date).format("YYYY-MM-DD");
           newRequest.remarks = dto.remarks;
           newRequest.client = await entityManager.findOne(Clients, {

@@ -110,7 +110,7 @@ export class CreateCertificateRequestDto {
   
   @ApiProperty()
   @IsNotEmpty()
-  fullName: string;
+  requestersFullName: string;
 
   @ApiProperty()
   @IsNotEmpty()
