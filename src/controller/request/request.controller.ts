@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from "@nestjs/common";
 import { ApiTags, ApiBearerAuth, ApiQuery } from "@nestjs/swagger";
 import { CustomResponse } from "src/common/helper/customresponse.helpers";
+import { JwtAuthGuard } from "src/core/auth/jwt.auth.guard";
 import {
   CreateBaptismalCertificateRequestDto,
   CreateConfirmationCertificateRequestDto,
@@ -12,14 +13,14 @@ import { RequestService } from "src/services/request.service";
 
 @ApiTags("request")
 @Controller("request")
-@ApiBearerAuth()
+@ApiBearerAuth("jwt")
 export class RequestController {
   constructor(private readonly requestService: RequestService) {}
 
   @Get("getByStatus")
   @ApiQuery({ name: "clientId", required: false })
   @ApiQuery({ name: "requestStatus", required: false })
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getByStatus(
     // eslint-disable-next-line @typescript-eslint/no-inferrable-types
     @Query("clientId") clientId: string = "",
@@ -50,7 +51,7 @@ export class RequestController {
   @ApiQuery({ name: "requestType", required: false })
   @ApiQuery({ name: "requestDateFrom", type: Date, required: false })
   @ApiQuery({ name: "requestDateTo", required: false })
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getByAdvanceSearch(
     @Query("isAdvance") isAdvance: boolean,
     // eslint-disable-next-line @typescript-eslint/no-inferrable-types
@@ -86,7 +87,7 @@ export class RequestController {
   }
 
   @Get(":requestId")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getById(@Param("requestId") requestId: string) {
     const res: CustomResponse = {};
     try {
@@ -101,7 +102,7 @@ export class RequestController {
   }
 
   @Post("createBaptismalCertificateRequest")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async createBaptismalCertificateRequest(
     @Body() dto: CreateBaptismalCertificateRequestDto
   ) {
@@ -121,7 +122,7 @@ export class RequestController {
   }
 
   @Post("createConfirmationCertificateRequest")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async createConfirmationCertificateRequest(
     @Body() dto: CreateConfirmationCertificateRequestDto
   ) {
@@ -141,7 +142,7 @@ export class RequestController {
   }
 
   @Post("createMarriageContractCertificateRequest")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async createMarriageContractCertificateRequest(
     @Body() dto: CreateMarriageContractCertificateRequestDto
   ) {
@@ -159,7 +160,7 @@ export class RequestController {
   }
 
   @Post("createCertificateRequest")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async createCertificateRequest(
     @Body() dto: CreateCertificateRequestDto
   ) {
@@ -177,7 +178,7 @@ export class RequestController {
   }
   
   @Put("updateRequestStatus")
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async updateRequestStatus(@Body() dto: UpdateRequestStatusDto) {
     const res: CustomResponse = {};
     try {

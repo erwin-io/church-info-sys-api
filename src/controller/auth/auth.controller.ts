@@ -55,6 +55,7 @@ export class AuthController {
     }
   }
 
+  @UseGuards(LocalAuthGuard)
   @Post("login/staff")
   public async loginStaff(@Body() loginUserDto: LoginUserDto) {
     const res: CustomResponse = {};
@@ -98,9 +99,9 @@ export class AuthController {
     }
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth("jwt")
   @Post("/logout")
+  @UseGuards(JwtAuthGuard)
   public async logout(@GetUser() user: UserDto) {
     const res: CustomResponse = {};
     try {
@@ -114,8 +115,9 @@ export class AuthController {
     }
   }
 
-  @UseGuards(LocalAuthGuard)
+  @ApiBearerAuth("jwt")
   @Get("whoami")
+  @UseGuards(LocalAuthGuard)
   public async testAuth(@Req() req: any): Promise<JwtPayload> {
     return req.user;
   }

@@ -195,6 +195,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign(user, {
       secret: secret,
       expiresIn: expiresIn,
+      algorithm: "RS256",
     });
     return accessToken;
   }
@@ -209,6 +210,7 @@ export class AuthService {
     const accessToken = this.jwtService.sign(user, {
       secret: secret,
       expiresIn: expiresIn,
+      algorithm: "RS256",
     });
     return accessToken;
   }
@@ -255,6 +257,7 @@ export class AuthService {
     try {
       return this.jwtService.verifyAsync(jwt, {
         secret: fs.readFileSync(path.join(__dirname, "../../private.key")),
+        algorithms: ["RS256"],
       });
     } catch (ex) {
       throw ex;

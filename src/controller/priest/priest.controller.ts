@@ -8,14 +8,14 @@ import { PriestService } from 'src/services/priest.service';
 
 @ApiTags("priest")
 @Controller("priest")
-// @ApiBearerAuth()
+@ApiBearerAuth("jwt")
 export class PriestController {
     constructor(
       private readonly priestService: PriestService
     ) {}
   
     @Get("")
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     async getAll() {
       const res: CustomResponse = {};
       try {
@@ -30,7 +30,7 @@ export class PriestController {
     }
   
     @Get("findByAvailability")
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     @ApiQuery({ name: "dayNum", required: true, type: Number })
     @ApiQuery({ name: "timeNum", required: true, type: Number })
     async findByAvailability(
@@ -51,7 +51,7 @@ export class PriestController {
     }
   
     @Get(":priestId")
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     async findOne(@Param("priestId") priestId: string) {
       const res: CustomResponse = {};
       try {
@@ -68,7 +68,7 @@ export class PriestController {
     }
   
     @Post()
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     async create(@Body() createPriestDto: CreatePriestDto) {
       const res: CustomResponse = {};
       try {
@@ -85,7 +85,7 @@ export class PriestController {
     }
   
     @Put()
-    // @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard)
     async update(@Body() priestDto: PriestDto) {
       const res: CustomResponse = {};
       try {
@@ -100,6 +100,7 @@ export class PriestController {
     }
   
     @Delete(":priestId")
+    @UseGuards(JwtAuthGuard)
     async delete(@Param("priestId") priestId: string) {
       const res: CustomResponse = {};
       try {
